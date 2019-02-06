@@ -1,6 +1,6 @@
 {
-  "name": "react-live",
-  "version": "1.12.0",
+  "name": "react-live-replacement",
+  "version": "1.13.0",
   "description": "A production-focused playground for live editing React code",
   "main": "build/react-live.cjs.js",
   "typings": "./typings/react-live.d.ts",
