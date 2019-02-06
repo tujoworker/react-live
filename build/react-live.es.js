@@ -569,7 +569,7 @@ var LiveProvider = function (_Component) {
 
       // Transpilation arguments
       var input = {
-        code: transformCode ? transformCode(code) : code,
+        code: transformCode ? transformCode('<>' + code + '</>') : '<>' + code + '</>',
         scope: scope
       };
       var errorCallback = function errorCallback(err) {
