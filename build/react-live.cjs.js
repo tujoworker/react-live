@@ -574,9 +574,12 @@ var LiveProvider = function (_Component) {
           _ref$noInline = _ref.noInline,
           noInline = _ref$noInline === undefined ? false : _ref$noInline;
 
+      if (!noInline) {
+        code = '<>' + code + '</>';
+      }
       // Transpilation arguments
       var input = {
-        code: transformCode ? transformCode('<>' + code + '</>') : '<>' + code + '</>',
+        code: transformCode ? transformCode(code) : code,
         scope: scope
       };
       var errorCallback = function errorCallback(err) {

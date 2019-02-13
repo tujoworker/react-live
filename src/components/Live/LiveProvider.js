@@ -33,9 +33,12 @@ export default class LiveProvider extends Component {
   };
 
   transpile = ({ code, scope, transformCode, noInline = false }) => {
+    if(!noInline){
+      code = `<>${code}</>`
+    }
     // Transpilation arguments
     const input = {
-      code: transformCode ? transformCode(`<>${code}</>`) : `<>${code}</>`,
+      code: transformCode ? transformCode(code) : code,
       scope,
     };
     const errorCallback = err =>
