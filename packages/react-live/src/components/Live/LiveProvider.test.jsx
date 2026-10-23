@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import LiveProvider from "./LiveProvider";
@@ -33,25 +33,23 @@ describe("rendering code", () => {
   );
 
   it("ignores delayed noInline callbacks from an older edit", async () => {
-    let complete;
     const scope = {
-      capture: (callback) => {
-        complete = callback;
-      },
+      capture: vi.fn(),
     };
     const { rerender } = renderLive({
       noInline: true,
       scope,
       code: "capture(() => render(<strong>old</strong>))",
     });
-    await act(async () => {});
+    await waitFor(() => expect(scope.capture).toHaveBeenCalledOnce());
+    const [complete] = scope.capture.mock.calls[0];
     rerender(
       <LiveProvider noInline scope={scope} code="render(<strong>new</strong>)">
         <LivePreview />
       </LiveProvider>,
     );
     await screen.findByText("new");
-    act(() => complete());
+    act(complete);
     expect(document.querySelector("strong").textContent).toBe("new");
   });
 
@@ -224,10 +222,11 @@ describe("transformCode", () => {
 
   it("ignores stale asynchronous transform results", async () => {
     const resolvers = new Map();
-    const transformCode = (code) =>
-      new Promise((resolve) => {
-        resolvers.set(code, resolve);
-      });
+    const transformCode = (code) => {
+      const { promise, resolve } = Promise.withResolvers();
+      resolvers.set(code, resolve);
+      return promise;
+    };
     const { rerender } = render(
       <LiveProvider code="first" transformCode={transformCode}>
         <LivePreview />

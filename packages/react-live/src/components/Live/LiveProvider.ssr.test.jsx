@@ -45,7 +45,7 @@ describe("LiveProvider SSR", () => {
     const container = document.createElement("div");
     container.innerHTML = ReactDOMServer.renderToString(preview);
     let root;
-    await act(async () => {
+    await act(() => {
       root = hydrateRoot(container, preview);
     });
     expect(container.innerHTML).toMatchSnapshot();
@@ -68,7 +68,7 @@ describe("LiveProvider SSR", () => {
       const container = document.createElement("div");
       container.innerHTML = ReactDOMServer.renderToString(preview);
       let root;
-      await act(async () => {
+      await act(() => {
         root = hydrateRoot(container, preview);
       });
       expect(container.innerHTML).toMatchSnapshot();
@@ -85,7 +85,7 @@ describe("LiveProvider SSR", () => {
         );
       });
       expect(container.innerHTML).toMatchSnapshot();
-      await act(async () => root.unmount());
+      await act(() => root.unmount());
     },
   );
 
@@ -157,7 +157,7 @@ describe("LiveProvider SSR", () => {
     const onRecoverableError = vi.fn();
 
     let root;
-    await act(async () => {
+    await act(() => {
       root = hydrateRoot(container, preview, { onRecoverableError });
     });
 
@@ -165,19 +165,18 @@ describe("LiveProvider SSR", () => {
     expect(transformCode).toHaveBeenCalledTimes(2);
     expect(onRecoverableError).not.toHaveBeenCalled();
 
-    await act(async () => root.unmount());
+    await act(() => root.unmount());
   });
 
   it.each([false, true])(
     "renders an async transform after hydration (StrictMode: %s)",
     async (strict) => {
       const resolvers = [];
-      const transformCode = vi.fn(
-        () =>
-          new Promise((resolve) => {
-            resolvers.push(resolve);
-          }),
-      );
+      const transformCode = vi.fn(() => {
+        const { promise, resolve } = Promise.withResolvers();
+        resolvers.push(resolve);
+        return promise;
+      });
       const Wrapper = strict ? StrictMode : React.Fragment;
       const preview = (
         <Wrapper>
@@ -191,13 +190,13 @@ describe("LiveProvider SSR", () => {
       const onRecoverableError = vi.fn();
 
       let root;
-      await act(async () => {
+      await act(() => {
         root = hydrateRoot(container, preview, { onRecoverableError });
       });
 
       expect(container.innerHTML).toMatchSnapshot();
 
-      await act(async () => {
+      await act(() => {
         resolvers.forEach((resolve) => resolve("<strong>Hello SSR!</strong>"));
       });
 
@@ -205,7 +204,7 @@ describe("LiveProvider SSR", () => {
       expect(onRecoverableError).not.toHaveBeenCalled();
       expect(transformCode).toHaveBeenCalledTimes(strict ? 3 : 2);
 
-      await act(async () => root.unmount());
+      await act(() => root.unmount());
     },
   );
 
@@ -219,7 +218,7 @@ describe("LiveProvider SSR", () => {
     container.innerHTML = ReactDOMServer.renderToString(firstPreview);
 
     let root;
-    await act(async () => {
+    await act(() => {
       root = hydrateRoot(container, firstPreview);
     });
 
@@ -233,7 +232,7 @@ describe("LiveProvider SSR", () => {
 
     expect(container.innerHTML).toMatchSnapshot();
 
-    await act(async () => root.unmount());
+    await act(() => root.unmount());
   });
 
   it("renders transform errors during the initial server render", () => {
