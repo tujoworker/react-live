@@ -26,7 +26,7 @@ describe("LiveProvider SSR", () => {
     });
     // StrictMode invokes the client initializer twice; the server invokes it once.
     expect(transformCode).toHaveBeenCalledTimes(3);
-    expect(container.textContent).toBe("hello");
+    expect(container.innerHTML).toMatchSnapshot();
     expect(onRecoverableError).not.toHaveBeenCalled();
     await act(() => root.unmount());
   });
@@ -48,9 +48,7 @@ describe("LiveProvider SSR", () => {
     await act(async () => {
       root = hydrateRoot(container, preview);
     });
-    expect(container.querySelector("pre").textContent).toBe(
-      "Error: transform failed",
-    );
+    expect(container.innerHTML).toMatchSnapshot();
     await act(() => root.unmount());
   });
 
@@ -73,9 +71,7 @@ describe("LiveProvider SSR", () => {
       await act(async () => {
         root = hydrateRoot(container, preview);
       });
-      expect(container.querySelector("pre").textContent).toContain(
-        invalidCode === undefined ? "Code failed to transform" : "SyntaxError",
-      );
+      expect(container.innerHTML).toMatchSnapshot();
       await act(async () => {
         root.render(
           <LiveProvider
@@ -88,8 +84,7 @@ describe("LiveProvider SSR", () => {
           </LiveProvider>,
         );
       });
-      expect(container.querySelector("strong").textContent).toBe("fixed");
-      expect(container.querySelector("pre")).toBeNull();
+      expect(container.innerHTML).toMatchSnapshot();
       await act(async () => root.unmount());
     },
   );
@@ -101,7 +96,7 @@ describe("LiveProvider SSR", () => {
       </LiveProvider>,
     );
 
-    expect(html).toBe("<div></div>");
+    expect(html).toMatchSnapshot();
   });
 
   it("renders inline previews during the initial server render", () => {
@@ -111,7 +106,7 @@ describe("LiveProvider SSR", () => {
       </LiveProvider>,
     );
 
-    expect(html).toBe("<div><strong>Hello SSR!</strong></div>");
+    expect(html).toMatchSnapshot();
   });
 
   it("renders noInline previews during the initial server render", () => {
@@ -121,7 +116,7 @@ describe("LiveProvider SSR", () => {
       </LiveProvider>,
     );
 
-    expect(html).toBe("<div><strong>Hello SSR!</strong></div>");
+    expect(html).toMatchSnapshot();
   });
 
   it("renders transformed code when transformCode is synchronous", () => {
@@ -132,7 +127,7 @@ describe("LiveProvider SSR", () => {
       </LiveProvider>,
     );
 
-    expect(html).toBe("<div><strong>Hello SSR!</strong></div>");
+    expect(html).toMatchSnapshot();
     expect(transformCode).toHaveBeenCalledOnce();
   });
 
@@ -147,7 +142,7 @@ describe("LiveProvider SSR", () => {
       </LiveProvider>,
     );
 
-    expect(html).toBe("<div></div>");
+    expect(html).toMatchSnapshot();
   });
 
   it("does not repeat a synchronous transform after hydration", async () => {
@@ -166,7 +161,7 @@ describe("LiveProvider SSR", () => {
       root = hydrateRoot(container, preview, { onRecoverableError });
     });
 
-    expect(container.innerHTML).toBe("<div><strong>Hello SSR!</strong></div>");
+    expect(container.innerHTML).toMatchSnapshot();
     expect(transformCode).toHaveBeenCalledTimes(2);
     expect(onRecoverableError).not.toHaveBeenCalled();
 
@@ -200,15 +195,13 @@ describe("LiveProvider SSR", () => {
         root = hydrateRoot(container, preview, { onRecoverableError });
       });
 
-      expect(container.innerHTML).toBe("<div></div>");
+      expect(container.innerHTML).toMatchSnapshot();
 
       await act(async () => {
         resolvers.forEach((resolve) => resolve("<strong>Hello SSR!</strong>"));
       });
 
-      expect(container.innerHTML).toBe(
-        "<div><strong>Hello SSR!</strong></div>",
-      );
+      expect(container.innerHTML).toMatchSnapshot();
       expect(onRecoverableError).not.toHaveBeenCalled();
       expect(transformCode).toHaveBeenCalledTimes(strict ? 3 : 2);
 
@@ -238,7 +231,7 @@ describe("LiveProvider SSR", () => {
       );
     });
 
-    expect(container.innerHTML).toBe("<div><strong>second</strong></div>");
+    expect(container.innerHTML).toMatchSnapshot();
 
     await act(async () => root.unmount());
   });
@@ -257,7 +250,7 @@ describe("LiveProvider SSR", () => {
       </LiveProvider>,
     );
 
-    expect(html).toBe("<div></div><pre>Error: Failed to transform</pre>");
+    expect(html).toMatchSnapshot();
   });
 
   it("renders noInline evaluation errors during the initial server render", () => {
@@ -268,6 +261,6 @@ describe("LiveProvider SSR", () => {
       </LiveProvider>,
     );
 
-    expect(html).toContain("No-Inline evaluations must call `render`.");
+    expect(html).toMatchSnapshot();
   });
 });
