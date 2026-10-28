@@ -108,7 +108,8 @@ jobs:
             dependencies.react-dom="${{ matrix.react }}" \
             -w website
           # Keep unrelated build tools at their locked versions.
-          npm install
+          npm install --package-lock-only
+          npm ci
       - name: Build
         run: npm run build
       - name: Check
